@@ -13,7 +13,6 @@ class FlutterJpush {
   MessageHandler _onResume;
   String _registrationID;
 
-
   static Future<String> get platformVersion async {
     final String version = await _channel.invokeMethod('getPlatformVersion');
     return version;
@@ -22,6 +21,38 @@ class FlutterJpush {
   static Future<dynamic> initJpush() async {
     final dynamic result = await _channel.invokeMethod('initJpush');
     return result;
+  }
+
+  static void stopPush() async {
+    await _channel.invokeMethod('stopPush');
+  }
+
+  static void resumePush() async {
+    await _channel.invokeMethod('resumePush');
+  }
+
+  //根据用户别名发消息给指定用户
+  static void setAlias(String alias) async {
+    await _channel.invokeMethod('setAlias', alias);
+  }
+
+  static void deleteAlias(String alias) async {
+    await _channel.invokeMethod('deleteAlias', alias);
+  }
+
+  static void getAlias() async {
+    await _channel.invokeMethod('getAlias');
+  }
+
+  //如果用户登录设置过一次别名，jpush plugin 将把别名存放在文件中，
+  // 下次打开，自动设置已有的别名，如果logout请先deleteAlias再清除jpush缓存clearCache，
+  static void clearCache() async {
+    await _channel.invokeMethod('clearCache');
+  }
+
+  //flutter中jpush配置完成调用ready
+  static void ready() async {
+    await _channel.invokeMethod('ready');
   }
 
   static Future<String> test() async {

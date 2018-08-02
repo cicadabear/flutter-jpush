@@ -36,6 +36,7 @@ class _MyAppState extends State<MyApp> {
 //        _navigateToItemDetail(message);
       },
     );
+    FlutterJpush.ready();
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -67,6 +68,11 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  void _setAlias() async {
+    String alias = '123456';
+    FlutterJpush.setAlias(alias);
+  }
+
   Future _initJPush() async {
     //init JPush
     dynamic result = await FlutterJpush.initJpush();
@@ -89,6 +95,10 @@ class _MyAppState extends State<MyApp> {
               new RaisedButton(
                 child: new Text('init JPush'),
                 onPressed: _initJPush,
+              ),
+              new RaisedButton(
+                child: new Text('setAlias'),
+                onPressed: _setAlias,
               ),
               new RaisedButton(
                 child: new Text('test'),
