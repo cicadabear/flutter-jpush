@@ -22,7 +22,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     initPlatformState();
     _initJPush().then((data) {
-      FlutterJpush.ready();
+//      FlutterJpush.ready();
     });
     _flutterJpush.configure(
       onMessage: (Map<String, dynamic> message) {

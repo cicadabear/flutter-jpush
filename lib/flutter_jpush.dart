@@ -50,9 +50,9 @@ class FlutterJpush {
   }
 
   //flutter中jpush配置完成调用ready
-  static void ready() async {
-    await _channel.invokeMethod('ready');
-  }
+//  static void ready() async {
+//    await _channel.invokeMethod('ready');
+//  }
 
   static Future<String> test() async {
     final String result = await _channel.invokeMethod('test');

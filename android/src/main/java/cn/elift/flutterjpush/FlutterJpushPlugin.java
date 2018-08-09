@@ -80,6 +80,7 @@ public class FlutterJpushPlugin extends BroadcastReceiver implements MethodCallH
             } else if (JPushInterface.ACTION_REGISTRATION_ID.equals(intent.getAction())) {
                 String regId = bundle.getString(JPushInterface.EXTRA_REGISTRATION_ID);
                 Logger.d(TAG, "[MyReceiver] 接收Registration Id : " + regId);
+                ready = true;
                 //send the Registration Id to your server...
                 if (channel != null)
                     channel.invokeMethod("onMessage", bundleToMap(bundle));
@@ -154,12 +155,8 @@ public class FlutterJpushPlugin extends BroadcastReceiver implements MethodCallH
             result.success("Android " + android.os.Build.VERSION.RELEASE);
         } else if ("initJpush".equals(call.method)) {
             initJpush();
-            String rid = JPushInterface.getRegistrationID(context);
-            if (!rid.isEmpty()) {
-                result.success(rid);
-            } else {
-                result.error("var1", "var2", "var3");
-            }
+            JPushInterface.getRegistrationID(context);
+            result.success(null);
 //            ready = true;
         } else if ("setAlias".equals(call.method)) {
             String alias = call.arguments();
@@ -169,10 +166,12 @@ public class FlutterJpushPlugin extends BroadcastReceiver implements MethodCallH
             deleteAlias(context, alias);
         } else if ("getAlias".equals(call.method)) {
             getAlias(context);
-        } else if ("ready".equals(call.method)) {
-            ready = true;
-            result.success(null);
-        } else if ("stopPush".equals(call.method)) {
+        }
+//        else if ("ready".equals(call.method)) {
+//            ready = true;
+//            result.success(null);
+//        }
+        else if ("stopPush".equals(call.method)) {
             JPushInterface.stopPush(context);
             result.success(null);
         } else if ("resumePush".equals(call.method)) {
