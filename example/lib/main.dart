@@ -21,22 +21,20 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     initPlatformState();
-    _initJPush();
+    _initJPush().then((data) {
+      FlutterJpush.ready();
+    });
     _flutterJpush.configure(
       onMessage: (Map<String, dynamic> message) {
         print("onMessage: $message");
 //        _showItemDialog(message);
-      },
-      onLaunch: (Map<String, dynamic> message) {
-        print("onLaunch: $message");
-//        _navigateToItemDetail(message);
       },
       onResume: (Map<String, dynamic> message) {
         print("onResume: $message");
 //        _navigateToItemDetail(message);
       },
     );
-    FlutterJpush.ready();
+//    FlutterJpush.ready();
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
