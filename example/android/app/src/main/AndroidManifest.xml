@@ -15,6 +15,7 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="flutter_jpush_example"
+        android:testOnly="false"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

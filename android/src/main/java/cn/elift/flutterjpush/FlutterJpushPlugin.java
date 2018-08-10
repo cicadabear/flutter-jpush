@@ -1,5 +1,6 @@
 package cn.elift.flutterjpush;
 
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +9,8 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+
+import java.util.List;
 
 import cn.jpush.android.api.JPushInterface;
 import io.flutter.plugin.common.MethodCall;
@@ -89,27 +92,16 @@ public class FlutterJpushPlugin extends BroadcastReceiver implements MethodCallH
                 }
             } else if (JPushInterface.ACTION_NOTIFICATION_OPENED.equals(intent.getAction())) {
                 Logger.d(TAG, "[MyReceiver] 用户点击打开了通知");
-                if (channel != null) {
+                if (channel != null && registrar.activity() != null) {
+                    if (!isAppOnForeground(context)) {
+                        bringAppToForeground(context, null);
+                    }
                     Logger.d(TAG, channel.toString());
+                    Logger.d(TAG, registrar.activity().toString());
                     channel.invokeMethod("onResume", bundleToMap(bundle));
                 } else {
                     //打开自定义的Activity
-                    SharedPreferences prefs = context.getSharedPreferences("JPUSH", MODE_PRIVATE);
-                    String className = prefs.getString("MAIN_ACTIVITY_CLASSNAME", "");
-                    Logger.d(TAG, "ActivityClassName----" + className);
-                    if (className.isEmpty()) {
-                        return;
-                    }
-                    try {
-                        Class<?> activityClass = Class.forName(className);
-                        Intent i = new Intent(context, activityClass);
-                        i.putExtras(bundle);
-                        //i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        context.startActivity(i);
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
+                    bringAppToForeground(context, bundle);
                     //等待MainActivity打开 调用flutter code
                     Thread t1 = new Thread(new Runnable() {
                         public void run() {
@@ -145,6 +137,44 @@ public class FlutterJpushPlugin extends BroadcastReceiver implements MethodCallH
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean bringAppToForeground(Context context, Bundle bundle) {
+        SharedPreferences prefs = context.getSharedPreferences("JPUSH", MODE_PRIVATE);
+        String className = prefs.getString("MAIN_ACTIVITY_CLASSNAME", "");
+        Logger.d(TAG, "ActivityClassName----" + className);
+        if (className.isEmpty()) {
+            return false;
+        }
+        Class<?> activityClass = null;
+        try {
+            activityClass = Class.forName(className);
+            Intent i = new Intent(context, activityClass);
+            if (bundle != null)
+                i.putExtras(bundle);
+            //i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            context.startActivity(i);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return true;
+    }
+
+    private boolean isAppOnForeground(Context context) {
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
+        if (appProcesses == null) {
+            return false;
+        }
+        final String packageName = context.getPackageName();
+        for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
+            if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND && appProcess.processName.equals(packageName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
