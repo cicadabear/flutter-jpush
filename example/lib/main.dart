@@ -73,7 +73,7 @@ class _MyAppState extends State<MyApp> {
 
   Future _initJPush() async {
     //init JPush
-    dynamic result = await FlutterJpush.initJpush();
+    dynamic result = await FlutterJpush.initJpush("debug");
     print(result);
   }
 

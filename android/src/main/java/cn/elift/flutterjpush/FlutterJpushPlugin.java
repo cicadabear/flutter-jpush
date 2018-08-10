@@ -154,7 +154,12 @@ public class FlutterJpushPlugin extends BroadcastReceiver implements MethodCallH
         if (call.method.equals("getPlatformVersion")) {
             result.success("Android " + android.os.Build.VERSION.RELEASE);
         } else if ("initJpush".equals(call.method)) {
-            initJpush();
+            String env = call.arguments();
+            Boolean debugMode = false;
+            if (env != null && env.equalsIgnoreCase("debug")) {
+                debugMode = true;
+            }
+            initJpush(debugMode);
             JPushInterface.getRegistrationID(context);
             result.success(null);
 //            ready = true;
@@ -165,8 +170,8 @@ public class FlutterJpushPlugin extends BroadcastReceiver implements MethodCallH
         } else if ("deleteAlias".equals(call.method)) {
 //            String alias = call.arguments();
             SharedPreferences prefs = context.getSharedPreferences("JPUSH", MODE_PRIVATE);
-            String alias = prefs.getString("ALIAS","");
-            if(!alias.isEmpty()){
+            String alias = prefs.getString("ALIAS", "");
+            if (!alias.isEmpty()) {
                 deleteAlias(context, alias);
             }
             result.success(null);
@@ -206,8 +211,16 @@ public class FlutterJpushPlugin extends BroadcastReceiver implements MethodCallH
     }
 
     private void initJpush() {
-        JPushInterface.init(context);
         SharedPreferences prefs = context.getSharedPreferences("JPUSH", MODE_PRIVATE);
+        Boolean debug = prefs.getBoolean("DEBUG", false);
+        initJpush(debug);
+    }
+
+    private void initJpush(Boolean debug) {
+        JPushInterface.init(context);
+        JPushInterface.setDebugMode(debug);
+        SharedPreferences prefs = context.getSharedPreferences("JPUSH", MODE_PRIVATE);
+        prefs.edit().putBoolean("DEBUG", debug);
         String alias = prefs.getString("ALIAS", null);
         if (alias != null) {
             Log.d(TAG, "setAlias alias" + alias);
