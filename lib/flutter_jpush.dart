@@ -17,8 +17,8 @@ class FlutterJpush {
     return version;
   }
 
-  static Future<dynamic> initJpush(String env) async {
-    final dynamic result = await _channel.invokeMethod('initJpush', env);
+  static Future<dynamic> initJpush() async {
+    final dynamic result = await _channel.invokeMethod('initJpush');
     return result;
   }
 

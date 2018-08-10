@@ -154,12 +154,7 @@ public class FlutterJpushPlugin extends BroadcastReceiver implements MethodCallH
         if (call.method.equals("getPlatformVersion")) {
             result.success("Android " + android.os.Build.VERSION.RELEASE);
         } else if ("initJpush".equals(call.method)) {
-            String env = call.arguments();
-            Boolean debugMode = false;
-            if (env != null && env.equalsIgnoreCase("debug")) {
-                debugMode = true;
-            }
-            initJpush(debugMode);
+            initJpush(BuildConfig.DEBUG);
             JPushInterface.getRegistrationID(context);
             result.success(null);
 //            ready = true;
