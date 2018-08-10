@@ -61,47 +61,43 @@ public class FlutterJpushPlugin extends BroadcastReceiver implements MethodCallH
     public void onReceive(Context context, Intent intent) {
 
         String action = intent.getAction();
-//        if (action.equals(FlutterFirebaseInstanceIDService.ACTION_TOKEN)) {
-//            String token = intent.getStringExtra(FlutterFirebaseInstanceIDService.EXTRA_TOKEN);
-//            channel.invokeMethod("onToken", token);
-//        } else if (action.equals(FlutterFirebaseMessagingService.ACTION_REMOTE_MESSAGE)) {
-//            RemoteMessage message =
-//                    intent.getParcelableExtra(FlutterFirebaseMessagingService.EXTRA_REMOTE_MESSAGE);
-//            channel.invokeMethod("onMessage", message.getData());
-//        }
         try {
             final Bundle bundle = intent.getExtras();
             Logger.d(TAG, "[MyReceiver] onReceive - " + intent.getAction() + ", extras: " + printBundle(bundle));
             if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
                 Logger.d(TAG, "检测到开机启动，去启动服务");
-//                Intent newIntent = new Intent(context, StartService.class);
-//                context.startService(newIntent);
                 initJpush();
             } else if (JPushInterface.ACTION_REGISTRATION_ID.equals(intent.getAction())) {
                 String regId = bundle.getString(JPushInterface.EXTRA_REGISTRATION_ID);
                 Logger.d(TAG, "[MyReceiver] 接收Registration Id : " + regId);
                 ready = true;
-                //send the Registration Id to your server...
-                if (channel != null)
+                if (channel != null) {
                     channel.invokeMethod("onMessage", bundleToMap(bundle));
+                }
             } else if (JPushInterface.ACTION_MESSAGE_RECEIVED.equals(intent.getAction())) {
                 Logger.d(TAG, "[MyReceiver] 接收到推送下来的自定义消息: " + bundle.getString(JPushInterface.EXTRA_MESSAGE));
 //                processCustomMessage(context, bundle);
-                if (channel != null)
+                if (channel != null) {
                     channel.invokeMethod("onMessage", bundleToMap(bundle));
+                }
             } else if (JPushInterface.ACTION_NOTIFICATION_RECEIVED.equals(intent.getAction())) {
                 Logger.d(TAG, "[MyReceiver] 接收到推送下来的通知");
                 int notifactionId = bundle.getInt(JPushInterface.EXTRA_NOTIFICATION_ID);
                 Logger.d(TAG, "[MyReceiver] 接收到推送下来的通知的ID: " + notifactionId);
-                if (channel != null)
+                if (channel != null) {
                     channel.invokeMethod("onMessage", bundleToMap(bundle));
+                }
             } else if (JPushInterface.ACTION_NOTIFICATION_OPENED.equals(intent.getAction())) {
                 Logger.d(TAG, "[MyReceiver] 用户点击打开了通知");
                 if (channel != null) {
                     channel.invokeMethod("onResume", bundleToMap(bundle));
                 } else {
                     //打开自定义的Activity
-                    String className = context.getApplicationContext().getPackageName() + ".MainActivity";
+                    SharedPreferences prefs = context.getSharedPreferences("JPUSH", MODE_PRIVATE);
+                    String className = prefs.getString("MAIN_ACTIVITY_CLASSNAME", "");
+                    if (className.isEmpty()) {
+                        return;
+                    }
                     try {
                         Class<?> activityClass = Class.forName(className);
                         Intent i = new Intent(context, activityClass);
@@ -155,6 +151,10 @@ public class FlutterJpushPlugin extends BroadcastReceiver implements MethodCallH
             result.success("Android " + android.os.Build.VERSION.RELEASE);
         } else if ("initJpush".equals(call.method)) {
             initJpush(BuildConfig.DEBUG);
+            String mainClassName = registrar.activity().getClass().toString();
+            SharedPreferences prefs = context.getSharedPreferences("JPUSH", MODE_PRIVATE);
+            prefs.edit().putString("MAIN_ACTIVITY_CLASSNAME", mainClassName);
+            prefs.edit().apply();
             JPushInterface.getRegistrationID(context);
             result.success(null);
 //            ready = true;
@@ -186,7 +186,7 @@ public class FlutterJpushPlugin extends BroadcastReceiver implements MethodCallH
             result.success(null);
         } else if ("clearCache".equals(call.method)) {
             SharedPreferences prefs = context.getSharedPreferences("JPUSH", MODE_PRIVATE);
-            prefs.edit().clear().apply();
+            prefs.edit().remove("ALIAS").remove("MAIN_ACTIVITY_CLASSNAME").apply();
             result.success(null);
         } else if ("test".equals(call.method)) {
             ApplicationInfo app = null;
