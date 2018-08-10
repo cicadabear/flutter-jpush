@@ -151,7 +151,7 @@ public class FlutterJpushPlugin extends BroadcastReceiver implements MethodCallH
             result.success("Android " + android.os.Build.VERSION.RELEASE);
         } else if ("initJpush".equals(call.method)) {
             initJpush(BuildConfig.DEBUG);
-            String mainClassName = registrar.activity().getClass().toString();
+            String mainClassName = registrar.activity().getClass().getName();
             SharedPreferences prefs = context.getSharedPreferences("JPUSH", MODE_PRIVATE);
             prefs.edit().putString("MAIN_ACTIVITY_CLASSNAME", mainClassName);
             prefs.edit().apply();
