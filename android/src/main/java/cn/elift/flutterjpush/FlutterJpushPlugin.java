@@ -90,11 +90,13 @@ public class FlutterJpushPlugin extends BroadcastReceiver implements MethodCallH
             } else if (JPushInterface.ACTION_NOTIFICATION_OPENED.equals(intent.getAction())) {
                 Logger.d(TAG, "[MyReceiver] 用户点击打开了通知");
                 if (channel != null) {
+                    Logger.d(TAG, channel.toString());
                     channel.invokeMethod("onResume", bundleToMap(bundle));
                 } else {
                     //打开自定义的Activity
                     SharedPreferences prefs = context.getSharedPreferences("JPUSH", MODE_PRIVATE);
                     String className = prefs.getString("MAIN_ACTIVITY_CLASSNAME", "");
+                    Logger.d(TAG, "ActivityClassName----" + className);
                     if (className.isEmpty()) {
                         return;
                     }
@@ -153,11 +155,10 @@ public class FlutterJpushPlugin extends BroadcastReceiver implements MethodCallH
             initJpush(BuildConfig.DEBUG);
             String mainClassName = registrar.activity().getClass().getName();
             SharedPreferences prefs = context.getSharedPreferences("JPUSH", MODE_PRIVATE);
-            prefs.edit().putString("MAIN_ACTIVITY_CLASSNAME", mainClassName);
-            prefs.edit().apply();
+            prefs.edit().putString("MAIN_ACTIVITY_CLASSNAME", mainClassName).apply();
             JPushInterface.getRegistrationID(context);
             result.success(null);
-//            ready = true;
+            ready = true;
         } else if ("setAlias".equals(call.method)) {
             String alias = call.arguments();
             setAlias(context, alias);
