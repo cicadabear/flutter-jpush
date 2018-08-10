@@ -162,8 +162,12 @@ public class FlutterJpushPlugin extends BroadcastReceiver implements MethodCallH
             String alias = call.arguments();
             setAlias(context, alias);
         } else if ("deleteAlias".equals(call.method)) {
-            String alias = call.arguments();
-            deleteAlias(context, alias);
+//            String alias = call.arguments();
+            SharedPreferences prefs = context.getSharedPreferences("JPUSH", MODE_PRIVATE);
+            String alias = prefs.getString("ALIAS","");
+            if(!alias.isEmpty()){
+                deleteAlias(context, alias);
+            }
         } else if ("getAlias".equals(call.method)) {
             getAlias(context);
         }

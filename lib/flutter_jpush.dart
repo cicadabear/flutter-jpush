@@ -35,8 +35,8 @@ class FlutterJpush {
     await _channel.invokeMethod('setAlias', alias);
   }
 
-  static void deleteAlias(String alias) async {
-    await _channel.invokeMethod('deleteAlias', alias);
+  static void deleteAlias() async {
+    await _channel.invokeMethod('deleteAlias');
   }
 
   static void getAlias() async {
