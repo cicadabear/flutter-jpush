@@ -161,6 +161,7 @@ public class FlutterJpushPlugin extends BroadcastReceiver implements MethodCallH
         } else if ("setAlias".equals(call.method)) {
             String alias = call.arguments();
             setAlias(context, alias);
+            result.success(null);
         } else if ("deleteAlias".equals(call.method)) {
 //            String alias = call.arguments();
             SharedPreferences prefs = context.getSharedPreferences("JPUSH", MODE_PRIVATE);
@@ -168,8 +169,10 @@ public class FlutterJpushPlugin extends BroadcastReceiver implements MethodCallH
             if(!alias.isEmpty()){
                 deleteAlias(context, alias);
             }
+            result.success(null);
         } else if ("getAlias".equals(call.method)) {
             getAlias(context);
+            result.success(null);
         }
 //        else if ("ready".equals(call.method)) {
 //            ready = true;
