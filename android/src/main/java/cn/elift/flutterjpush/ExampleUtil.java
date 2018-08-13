@@ -34,16 +34,19 @@ public class ExampleUtil {
             return true;
         return false;
     }
+
     /**
      * 只能以 “+” 或者 数字开头；后面的内容只能包含 “-” 和 数字。
-     * */
+     */
     private final static String MOBILE_NUMBER_CHARS = "^[+0-9][-0-9]{1,}$";
+
     public static boolean isValidMobileNumber(String s) {
-        if(TextUtils.isEmpty(s)) return true;
+        if (TextUtils.isEmpty(s)) return true;
         Pattern p = Pattern.compile(MOBILE_NUMBER_CHARS);
         Matcher m = p.matcher(s);
         return m.matches();
     }
+
     // 校验Tag Alias 只能是数字,英文字母和中文
     public static boolean isValidTagAndAlias(String s) {
         Pattern p = Pattern.compile("^[\u4E00-\u9FA50-9a-zA-Z_!@#$&*+=.|]+$");
@@ -71,58 +74,59 @@ public class ExampleUtil {
         }
         return appKey;
     }
-    
+
     // 取得版本号
     public static String GetVersion(Context context) {
-		try {
-			PackageInfo manager = context.getPackageManager().getPackageInfo(
-					context.getPackageName(), 0);
-			return manager.versionName;
-		} catch (NameNotFoundException e) {
-			return "Unknown";
-		}
-	}
-
-    public static void showToast(final String toast, final Context context)
-    {
-    	new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				Looper.prepare();
-				Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
-				Looper.loop();
-			}
-		}).start();
+        try {
+            PackageInfo manager = context.getPackageManager().getPackageInfo(
+                    context.getPackageName(), 0);
+            return manager.versionName;
+        } catch (NameNotFoundException e) {
+            return "Unknown";
+        }
     }
-    
+
+    public static void showToast(final String toast, final Context context) {
+        if (BuildConfig.DEBUG) {
+            new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    Looper.prepare();
+                    Toast.makeText(context, toast, Toast.LENGTH_SHORT).show();
+                    Looper.loop();
+                }
+            }).start();
+        }
+    }
+
     public static boolean isConnected(Context context) {
         ConnectivityManager conn = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = conn.getActiveNetworkInfo();
         return (info != null && info.isConnected());
     }
-    
-	public static String getImei(Context context, String imei) {
+
+    public static String getImei(Context context, String imei) {
         String ret = null;
-		try {
-			TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        try {
+            TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             ret = telephonyManager.getDeviceId();
-		} catch (Exception e) {
-			Logger.e(ExampleUtil.class.getSimpleName(), e.getMessage());
-		}
-		if (isReadableASCII(ret)){
+        } catch (Exception e) {
+            Logger.e(ExampleUtil.class.getSimpleName(), e.getMessage());
+        }
+        if (isReadableASCII(ret)) {
             return ret;
         } else {
             return imei;
         }
-	}
+    }
 
-    private static boolean isReadableASCII(CharSequence string){
+    private static boolean isReadableASCII(CharSequence string) {
         if (TextUtils.isEmpty(string)) return false;
         try {
             Pattern p = Pattern.compile("[\\x20-\\x7E]+");
             return p.matcher(string).matches();
-        } catch (Throwable e){
+        } catch (Throwable e) {
             return true;
         }
     }
