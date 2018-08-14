@@ -22,30 +22,30 @@ class FlutterJpush {
     return result;
   }
 
-  static void stopPush() async {
+  static Future<dynamic> stopPush() async {
     await _channel.invokeMethod('stopPush');
   }
 
-  static void resumePush() async {
+  static Future<dynamic> resumePush() async {
     await _channel.invokeMethod('resumePush');
   }
 
   //根据用户别名发消息给指定用户
-  static void setAlias(String alias) async {
+  static Future<dynamic> setAlias(String alias) async {
     await _channel.invokeMethod('setAlias', alias);
   }
 
-  static void deleteAlias() async {
+  static Future<dynamic> deleteAlias() async {
     await _channel.invokeMethod('deleteAlias');
   }
 
-  static void getAlias() async {
+  static Future<dynamic> getAlias() async {
     await _channel.invokeMethod('getAlias');
   }
 
   //如果用户登录设置过一次别名，jpush plugin 将把别名存放在文件中，
   // 下次打开，自动设置已有的别名，如果logout请先deleteAlias再清除jpush缓存clearCache，
-  static void clearCache() async {
+  static Future<dynamic> clearCache() async {
     await _channel.invokeMethod('clearCache');
   }
 
